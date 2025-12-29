@@ -15,7 +15,8 @@
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.54.4",
     "sass-loader": "^12.6.0",
-    "vue-loader": "^16.8.3"
+    "vue-loader": "^16.8.3",
+    "laravel-nova-devtool": "file:vendor/laravel/nova-devtool"
   },
   "dependencies": {
     "@inertiajs/vue3": "^2.3.4",

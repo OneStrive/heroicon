@@ -23,16 +23,17 @@
           </span>
         </div>
         <div class="flex justify-center items-center">
-          <DefaultButton class="ml-2" @click.prevent="toggleModal">
+          <Button class="ml-2" @click.prevent="toggleModal" variant="link">
             {{ openModalText }}
-          </DefaultButton>
-          <DefaultButton
+          </Button>
+          <Button
               class="ml-2"
               v-if="field.editor"
+              variant="link"
               @click.prevent="toggleEditor"
           >
             {{ editButtonText }}
-          </DefaultButton>
+          </Button>
         </div>
       </div>
       <transition name="fade">
@@ -132,10 +133,13 @@
 <script>
 // eslint-disable-next-line import/no-unresolved
 import { FormField, HandlesValidationErrors } from 'laravel-nova';
+import { Button } from 'laravel-nova-ui';
 
 export default {
   mixins: [FormField, HandlesValidationErrors],
-
+  components: {
+    Button,
+  },
   props: ['resourceName', 'resourceId', 'field'],
   data() {
     return {
