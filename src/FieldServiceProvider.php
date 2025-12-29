@@ -1,6 +1,6 @@
 <?php
 
-namespace AlexAzartsev\Heroicon;
+namespace OneStrive\Heroicon;
 
 use Illuminate\Support\ServiceProvider;
 use Laravel\Nova\Events\ServingNova;
@@ -18,15 +18,5 @@ class FieldServiceProvider extends ServiceProvider
         Nova::serving(function (ServingNova $event) {
             Nova::script('heroicon', __DIR__.'/../dist/js/field.js');
         });
-    }
-
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
-    public function register()
-    {
-        //
     }
 }

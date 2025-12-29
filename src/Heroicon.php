@@ -1,8 +1,9 @@
 <?php
 
-namespace AlexAzartsev\Heroicon;
+namespace OneStrive\Heroicon;
 
 use Laravel\Nova\Fields\Field;
+use Laravel\Nova\Http\Requests\NovaRequest;
 
 class Heroicon extends Field
 {
@@ -134,6 +135,15 @@ class Heroicon extends Field
     protected static function prepareIcons($key, $path): array
     {
         $icons = [];
+
+        /**
+         * Return empty set unless we are in a form context
+         */
+        $request = app(NovaRequest::class);
+        if (! $request->isCreateOrAttachRequest() && ! $request->isUpdateOrUpdateAttachedRequest()) {
+            return $icons;
+        }
+
         $files = scandir($path);
         foreach ($files as $file) {
             if (preg_match("/.*\.svg/i", $file)) {

@@ -1,6 +1,6 @@
 {
-    "name": "aimalamiri/heroicon",
-    "description": "A Laravel Nova field for managing icons.",
+    "name": "onestrive/heroicon",
+    "description": "Fork version with updated dependencies: A Laravel Nova field for managing icons.",
     "keywords": [
         "laravel",
         "nova",
@@ -13,7 +13,7 @@
         "name": "Alex Azartsev",
         "email": "alex.azarsecond@gmail.com",
         "homepage": "https://github.com/AlexAzartsev/heroicon",
-        "role": "Developer"
+        "role": "Original Developer"
       }
     ],
     "require": {
