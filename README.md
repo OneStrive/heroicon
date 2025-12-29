@@ -14,7 +14,7 @@ Icon saved as svg html tag into db.
 Use composer for installation. Laravel with nova required.
 
 ```bash
-composer require alexazartsev/heroicon
+composer require OneStrive/heroicon
 ```
 
 ## Usage:
@@ -22,7 +22,7 @@ composer require alexazartsev/heroicon
 Use it as regular nova field:
 
 ```php
-use AlexAzartsev\Heroicon\Heroicon;
+use OneStrive\Heroicon\Heroicon;
 
 Heroicon::make('Icon');
 ```
@@ -53,7 +53,7 @@ Field can be configured globally in `NovaServiceProvider`:
 ```php
 namespace App\Providers;
 
-use AlexAzartsev\Heroicon\Heroicon;
+use OneStrive\Heroicon\Heroicon;
 
 class NovaServiceProvider extends NovaApplicationServiceProvider
 {
@@ -80,7 +80,7 @@ class NovaServiceProvider extends NovaApplicationServiceProvider
 To disable or enable svg editor of the icon:
 
 ```php
-use AlexAzartsev\Heroicon\Heroicon;
+use OneStrive\Heroicon\Heroicon;
 
 Heroicon::make('Icon')->disableEditor();
 Heroicon::make('Icon')->enableEditor();
@@ -89,7 +89,7 @@ Heroicon::make('Icon')->enableEditor();
 To register custom set of icons (icons should be located directly in specified folder in .svg format):
 
 ```php
-use AlexAzartsev\Heroicon\Heroicon;
+use OneStrive\Heroicon\Heroicon;
 
 Heroicon::make('Icon')->registerIconSet('custom', 'Custom', resource_path('img/icons'));
 ```
@@ -97,7 +97,7 @@ Heroicon::make('Icon')->registerIconSet('custom', 'Custom', resource_path('img/i
 To allow certain sets of icons:
 
 ```php
-use AlexAzartsev\Heroicon\Heroicon;
+use OneStrive\Heroicon\Heroicon;
 
 Heroicon::make('Icon')->only(['custom', 'solid']);
 //for default sets you can use these methods:

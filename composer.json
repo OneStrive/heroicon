@@ -12,7 +12,7 @@
       {
         "name": "Alex Azartsev",
         "email": "alex.azarsecond@gmail.com",
-        "homepage": "https://github.com/AlexAzartsev/heroicon",
+        "homepage": "https://github.com/OneStrive/heroicon",
         "role": "Original Developer"
       }
     ],
@@ -22,13 +22,13 @@
     },
     "autoload": {
         "psr-4": {
-            "AlexAzartsev\\Heroicon\\": "src/"
+            "OneStrive\\Heroicon\\": "src/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
-                "AlexAzartsev\\Heroicon\\FieldServiceProvider"
+                "OneStrive\\Heroicon\\FieldServiceProvider"
             ]
         }
     },
