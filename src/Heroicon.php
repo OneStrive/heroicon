@@ -44,8 +44,31 @@ class Heroicon extends Field
         parent::__construct($name, $attribute, $resolveCallback);
         $this->registerDefaultIcons();
         $this->icons = self::$defaultIcons;
-        $this->withMeta(['editor' => self::$defaultEditorEnabled]);
+
+        // Pass metadata only (no icon content loading)
+        $this->withMeta([
+            'iconSets' => $this->getIconSetKeys(self::$defaultIconSets),
+            'editor' => self::$defaultEditorEnabled
+        ]);
         $this->only(self::$defaultIconSets);
+    }
+
+    /**
+     * Get icon set metadata (value and label only, no icons)
+     */
+    protected function getIconSetKeys(array $sets): array
+    {
+        $iconSets = [];
+        foreach ($sets as $set) {
+            $key = array_search($set, array_column(self::$supportedSets, 'value'));
+            if ($key !== false) {
+                $iconSets[] = [
+                    'value' => self::$supportedSets[$key]['value'],
+                    'label' => self::$supportedSets[$key]['label'],
+                ];
+            }
+        }
+        return $iconSets;
     }
 
     public function registerDefaultIcons()
@@ -101,23 +124,23 @@ class Heroicon extends Field
 
     public function registerIconSet(string $key, string $label, string $path)
     {
+        // Store metadata only (no icon loading)
         $this->icons[] = [
             'value' => $key,
             'label' => $label,
-            'icons' => $this->prepareIcons($key, $path)
         ];
 
         return $this->withMeta([
-            'icons' => $this->icons
+            'iconSets' => $this->icons
         ]);
     }
 
     public static function registerGlobalIconSet(string $key, string $label, string $path): void
     {
+        // Store metadata only (no icon loading)
         self::$defaultIcons[] = [
             'value' => $key,
             'label' => $label,
-            'icons' => self::prepareIcons($key, $path)
         ];
     }
 
@@ -162,7 +185,7 @@ class Heroicon extends Field
 
     public function only(array $sets)
     {
-        $filteredIcons = [];
+        $filteredIconSets = [];
         foreach ($sets as $set) {
             $suportedSetKey = array_search($set, array_column(self::$supportedSets, 'value'));
             if (array_search($set, array_column($this->icons, 'value')) === false && $suportedSetKey !== false) {
@@ -173,16 +196,15 @@ class Heroicon extends Field
                     $supportedSet['path']
                 );
             }
-            foreach ($this->icons as $icon) {
-                if ($icon['value'] === $set) {
-                    $filteredIcons[] = $icon;
+            foreach ($this->icons as $iconSet) {
+                if ($iconSet['value'] === $set) {
+                    $filteredIconSets[] = $iconSet;
                 }
             }
         }
 
-
         return $this->withMeta([
-            'icons' => $filteredIcons
+            'iconSets' => $filteredIconSets
         ]);
     }
 }
