@@ -10,7 +10,8 @@ class IconController extends Controller
 {
     /**
      * Get icons for specified sets
-     * GET /nova-vendor/heroicon/icons?sets[]=solid&sets[]=outline
+     * POST /nova-vendor/heroicon/icons
+     * Body: { "sets": ["solid", "outline"] }
      */
     public function index(Request $request): JsonResponse
     {

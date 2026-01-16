@@ -41,7 +41,7 @@ class FieldServiceProvider extends ServiceProvider
         Route::middleware(['nova'])
             ->prefix('nova-vendor/heroicon')
             ->group(function () {
-                Route::get('/icons', [IconController::class, 'index']);
+                Route::post('/icons', [IconController::class, 'index']);
             });
     }
 }

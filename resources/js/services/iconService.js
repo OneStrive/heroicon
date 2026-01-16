@@ -37,10 +37,11 @@ export default {
     window.HeroiconCache.error = null;
 
     const setKeys = iconSets.map(set => set.value);
-    const queryString = setKeys.map(key => `sets[]=${encodeURIComponent(key)}`).join('&');
 
     window.HeroiconCache.loadingPromise = Nova.request()
-      .get(`/nova-vendor/heroicon/icons?${queryString}`)
+      .post('/nova-vendor/heroicon/icons', {
+        sets: setKeys
+      })
       .then(response => {
         const iconSetsData = response.data.iconSets;
 
