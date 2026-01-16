@@ -189,8 +189,16 @@ export default {
       this.modalOpened = !this.modalOpened;
 
       // Load icons on first modal open
-      if (this.modalOpened && !this.iconsLoaded && !iconService.isCached()) {
-        await this.loadIcons();
+      if (this.modalOpened && !this.iconsLoaded) {
+        // Check if icons are now cached (by another field instance)
+        if (iconService.isCached()) {
+          // Use cached icons
+          this.defaultIcons = window.HeroiconCache.icons;
+          this.iconsLoaded = true;
+        } else {
+          // Load from API
+          await this.loadIcons();
+        }
       }
     },
     // NEW: Load icons from API
