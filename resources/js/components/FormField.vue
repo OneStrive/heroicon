@@ -71,59 +71,75 @@
               </svg>
             </a>
           </div>
-          <div class="px-8 py-4 border-b heroicon-controls">
-            <div class="flex flex-wrap -mx-4">
-              <div class="px-4" style="width: 33%">
-                <div class="flex relative">
-                  <select
-                      id="type"
-                      class="w-full form-control form-select
-                      form-select-bordered heroicons-sets-select"
-                      v-model="filter.type"
-                      :disabled="disableOptions"
-                  >
-                    <option v-for="opt in iconOptions" :value="opt.value" :key="opt.value">
-                      {{ opt.label }}
-                    </option>
-                  </select>
-                  <IconArrow class="pointer-events-none form-select-arrow" />
+
+          <!-- NEW: Loading state -->
+          <div v-if="loading" class="px-8 py-12 text-center">
+            <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100"></div>
+            <p class="mt-4 text-gray-600 dark:text-gray-400">Loading icons...</p>
+          </div>
+
+          <!-- NEW: Error state -->
+          <div v-else-if="error" class="px-8 py-12 text-center">
+            <p class="text-red-600 dark:text-red-400">Failed to load icons. Please try again.</p>
+            <Button class="mt-4" @click="retryLoadIcons">Retry</Button>
+          </div>
+
+          <!-- EXISTING: Controls and icons (only show when loaded) -->
+          <template v-else-if="icons.length > 0">
+            <div class="px-8 py-4 border-b heroicon-controls">
+              <div class="flex flex-wrap -mx-4">
+                <div class="px-4" style="width: 33%">
+                  <div class="flex relative">
+                    <select
+                        id="type"
+                        class="w-full form-control form-select
+                        form-select-bordered heroicons-sets-select"
+                        v-model="filter.type"
+                        :disabled="disableOptions"
+                    >
+                      <option v-for="opt in iconOptions" :value="opt.value" :key="opt.value">
+                        {{ opt.label }}
+                      </option>
+                    </select>
+                    <IconArrow class="pointer-events-none form-select-arrow" />
+                  </div>
+                </div>
+                <div class="px-4" style="width: 66%">
+                  <input
+                      type="text"
+                      id="search"
+                      class="w-full form-control form-input form-input-bordered heroicons-input"
+                      placeholder="Search icons"
+                      v-model="filter.search"
+                      @keypress.enter.prevent
+                  />
                 </div>
               </div>
-              <div class="px-4" style="width: 66%">
-                <input
-                    type="text"
-                    id="search"
-                    class="w-full form-control form-input form-input-bordered heroicons-input"
-                    placeholder="Search icons"
-                    v-model="filter.search"
-                    @keypress.enter.prevent
-                />
+            </div>
+            <div class="px-8 py-6 heroicon-inner">
+              <div class="flex flex-wrap items-baseline -mx-2 grid-container">
+                <div
+                    v-for="icon in filteredIcons"
+                    :key="`${icon.type}_${icon.name}`"
+                    class="
+                    flex flex-col flex-1
+                    items-center
+                    justify-center
+                    text-center
+                    px-2
+                    w-1/6
+                    cursor-pointer
+                    mb-4
+                    min-h-90px
+                  "
+                    @click="saveIcon(icon)"
+                >
+                  <div v-html="icon.content" class="w-12 h-12 icon-container"></div>
+                  <div>{{ icon.name }}</div>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="px-8 py-6 heroicon-inner">
-            <div class="flex flex-wrap items-baseline -mx-2 grid-container">
-              <div
-                  v-for="icon in filteredIcons"
-                  :key="`${icon.type}_${icon.name}`"
-                  class="
-                  flex flex-col flex-1
-                  items-center
-                  justify-center
-                  text-center
-                  px-2
-                  w-1/6
-                  cursor-pointer
-                  mb-4
-                  min-h-90px
-                "
-                  @click="saveIcon(icon)"
-              >
-                <div v-html="icon.content" class="w-12 h-12 icon-container"></div>
-                <div>{{ icon.name }}</div>
-              </div>
-            </div>
-          </div>
+          </template>
         </div>
       </Modal>
     </template>
@@ -134,6 +150,7 @@
 // eslint-disable-next-line import/no-unresolved
 import { FormField, HandlesValidationErrors } from 'laravel-nova';
 import { Button } from 'laravel-nova-ui';
+import iconService from '../services/iconService';
 
 export default {
   mixins: [FormField, HandlesValidationErrors],
@@ -151,6 +168,10 @@ export default {
         type: '',
         search: '',
       },
+      // NEW: Loading states
+      loading: false,
+      error: null,
+      iconsLoaded: false,
     };
   },
   methods: {
@@ -163,8 +184,34 @@ export default {
     clear() {
       this.value = '';
     },
-    toggleModal() {
+    // MODIFIED: Load icons when modal opens
+    async toggleModal() {
       this.modalOpened = !this.modalOpened;
+
+      // Load icons on first modal open
+      if (this.modalOpened && !this.iconsLoaded && !iconService.isCached()) {
+        await this.loadIcons();
+      }
+    },
+    // NEW: Load icons from API
+    async loadIcons() {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const icons = await iconService.fetchIcons(this.field.iconSets);
+        this.defaultIcons = icons;
+        this.iconsLoaded = true;
+      } catch (err) {
+        console.error('Failed to load icons:', err);
+        this.error = err;
+      } finally {
+        this.loading = false;
+      }
+    },
+    // NEW: Retry loading icons
+    async retryLoadIcons() {
+      await this.loadIcons();
     },
     toggleEditor() {
       this.editorOpened = !this.editorOpened;
@@ -188,12 +235,12 @@ export default {
     icons() {
       let allIcons = this.defaultIcons;
       const enabledTypes = [];
-      this.field.icons.forEach((iconSet) => {
+
+      // MODIFIED: Use iconSets instead of icons
+      this.field.iconSets.forEach((iconSet) => {
         enabledTypes.push(iconSet.value);
-        if (typeof iconSet.icons !== 'undefined') {
-          allIcons = [...allIcons, ...iconSet.icons];
-        }
       });
+
       return allIcons.filter((icon) => enabledTypes.includes(icon.type));
     },
     filteredIcons() {
@@ -220,18 +267,25 @@ export default {
       return 'Add icon';
     },
     iconOptions() {
-      if (this.field.icons.length > 1) {
-        return [{ value: '', label: 'All' }, ...this.field.icons];
+      // MODIFIED: Use iconSets
+      if (this.field.iconSets.length > 1) {
+        return [{ value: '', label: 'All' }, ...this.field.iconSets];
       }
-      return this.field.icons;
+      return this.field.iconSets;
     },
     disableOptions() {
-      return this.field.icons.length === 1;
+      return this.field.iconSets.length === 1;
     },
   },
   created() {
     document.addEventListener('keydown', this.escapeHandler);
     this.filter.type = this.iconOptions[0].value;
+
+    // NEW: Check if icons are already cached (for subsequent field instances)
+    if (iconService.isCached()) {
+      this.defaultIcons = window.HeroiconCache.icons;
+      this.iconsLoaded = true;
+    }
   },
   beforeUnmount() {
     document.removeEventListener('keydown', this.escapeHandler);
