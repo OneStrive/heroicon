@@ -39,7 +39,7 @@ class Heroicon extends Field
     protected static array $defaultIconSets = ['solid', 'outline', 'fa-brands', 'fa-regular', 'fa-solid'];
     protected static bool $defaultEditorEnabled = true;
 
-    public function __construct($name, $attribute = null, callable $resolveCallback = null)
+    public function __construct($name, $attribute = null, ?callable $resolveCallback = null)
     {
         parent::__construct($name, $attribute, $resolveCallback);
         $this->registerDefaultIcons();
